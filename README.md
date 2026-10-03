@@ -101,6 +101,22 @@ checked one type at a time:
 - The zDEV build of UE4SS (same commit) puts a symbolized UE4SS call stack into the game's own crash log at
   `%LOCALAPPDATA%\LORT\Saved\Logs\BW.log`.
 
+### Lua gotchas found on LORT
+- **Run Lua only on the game thread.** Heavy `LoopAsync` / `ExecuteWithDelay` / `RegisterKeyBind` callbacks
+  running at the same time as game-thread Lua corrupted the Lua state. The symptoms were nonsense errors such as
+  "UFunction expected 0 parameters, received 1", then an access violation in `lua_setiuservalue`. Use
+  `LoopInGameThreadWithDelay` and `ExecuteInGameThreadWithDelay` (both in the experimental build), and read keys
+  with `PlayerController:IsInputKeyDown({KeyName = FName("F1")})`.
+- **Don't call `UButton:SetStyle(style)`.** Passing an `FButtonStyle` through UE4SS hard-crashes the game. Edit
+  `button.WidgetStyle` fields in place before the widget is added to the viewport instead.
+- `widget:IsHovered()` resolves to a bool value, not the UFunction. Read it defensively, and use
+  `Button:IsPressed()` for click detection (a press followed by a release).
+- Relative `io.open` paths are relative to `Binaries\Win64`, not the `ue4ss` folder. Use absolute paths, or
+  derive the mod folder from `debug.getinfo(1, "S").source`.
+- **Saves** are plain JSON (`%LOCALAPPDATA%\LORT\Saved\SaveGames\<SteamID>\ProfileN*.sav`, rotating `_1`/`_2`),
+  with no checksum. The game rewrites them from memory while it runs, so edit them only while the game is closed,
+  or before the profile loads.
+
 ## Tools
 `tools/` is read-only: Python 3, Windows, only `PROCESS_VM_READ`. Run each script with the game running and
 UE4SS loaded.
