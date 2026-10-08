@@ -7,9 +7,6 @@ Out of the box, UE4SS crashes LORT on startup. LORT is built on **Unreal Engine 
 fork**, and that fork changes the memory layout of two core engine types. This repo contains the
 `MemberVariableLayout.ini` that tells UE4SS the real layout, plus the tools and method used to find it.
 
-With it, Lua mods, the live object viewer, SDK/header dumps and Blueprint mods all work. For a ready-made mod
-built on top of it, see [lort-mod-menu](https://github.com/9vsv6/lort-mod-menu).
-
 ## Install
 1. Download the **experimental** UE4SS build: `UE4SS_v3.0.1-1152-ge3ba1016.zip` or newer from
    [experimental-latest](https://github.com/UE4SS-RE/RE-UE4SS/releases/tag/experimental-latest). The 2024 stable
