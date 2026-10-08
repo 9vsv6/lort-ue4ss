@@ -109,6 +109,14 @@ checked one type at a time:
   with `PlayerController:IsInputKeyDown({KeyName = FName("F1")})`.
 - **Don't call `UButton:SetStyle(style)`.** Passing an `FButtonStyle` through UE4SS hard-crashes the game. Edit
   `button.WidgetStyle` fields in place before the widget is added to the viewport instead.
+- `PlayerController:IsInputKeyDown` is blind while the game's own UI owns input (the main menu, CommonUI
+  screens). For keys that must work there, use `RegisterKeyBind` and only queue work with `ExecuteInGameThread`
+  from the callback.
+- If you switch to `SetInputMode_GameAndUIEx` for a mouse UI, call
+  `WidgetBlueprintLibrary:SetFocusToGameViewport()` afterwards. Otherwise the focused widget swallows every key.
+- Rounded UMG: set `brush.DrawAs = 4` (RoundedBox) and `brush.OutlineSettings.CornerRadii` in place before the
+  widget is added to the viewport. `BackgroundBlur` works for frosted glass.
+- `KismetRenderingLibrary:ImportFileAsTexture2D(ctx, absPath)` loads a PNG from disk for `Image:SetBrushFromTexture`.
 - `widget:IsHovered()` resolves to a bool value, not the UFunction. Read it defensively, and use
   `Button:IsPressed()` for click detection (a press followed by a release).
 - Relative `io.open` paths are relative to `Binaries\Win64`, not the `ue4ss` folder. Use absolute paths, or
